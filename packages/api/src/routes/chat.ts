@@ -3,7 +3,7 @@ import { getChatManager } from '../services/chat/chat-manager.js';
 import { getLogger } from '../utils/logger.js';
 import { ApiResponse, ChatSession } from '@codescan/shared';
 
-const router = Router();
+const router: Router = Router();
 const logger = getLogger();
 const chatManager = getChatManager();
 

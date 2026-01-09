@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
-import { Conf } from 'conf';
+import Conf from 'conf';
 import { Formatters } from '../ui/formatters.js';
 
 const config = new Conf({ projectName: 'codescan' });
@@ -20,11 +20,11 @@ export const initCommand = new Command()
       },
     ]);
 
-    const searchPaths = answers.hasExisting
+    const searchPaths = (answers.hasExisting
       ? config.get('searchPaths', [])
-      : [];
+      : []) as any[];
 
-    const addMore = true;
+    let addMore = true;
 
     while (addMore) {
       const pathAnswer = await inquirer.prompt([
@@ -62,7 +62,7 @@ export const initCommand = new Command()
         },
       ]);
 
-      if (!another.addAnother) break;
+      addMore = another.addAnother;
     }
 
     // Save configuration

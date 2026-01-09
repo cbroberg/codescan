@@ -66,7 +66,7 @@ export class SemanticMatcher {
     intent: string;
     technologies?: string[];
     codePatterns?: string[];
-    clarificationNeeded: boolean;
+    clarificationNeeded?: boolean;
     clarificationQuestion?: string;
   }> {
     try {
@@ -141,7 +141,7 @@ Respond with JSON:
    */
   public async needsClarification(query: string): Promise<boolean> {
     const understanding = await this.understandQuery(query);
-    return understanding.clarificationNeeded;
+    return understanding.clarificationNeeded ?? false;
   }
 
   /**

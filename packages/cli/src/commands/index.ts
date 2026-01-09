@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { ApiClient } from '../client/api-client.js';
 import { Formatters } from '../ui/formatters.js';
 import ora from 'ora';
-import { Conf } from 'conf';
+import Conf from 'conf';
 
 const config = new Conf({ projectName: 'codescan' });
 const apiClient = new ApiClient();

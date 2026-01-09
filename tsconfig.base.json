@@ -18,10 +18,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@codescan/shared/*": ["./shared/src/*"],
-      "@codescan/shared": ["./shared/src/index.ts"]
+      "@codescan/shared": ["./shared/src/index.ts"],
+      "@codescan/shared/*": ["./shared/src/*"]
     }
-  },
-  "include": ["packages", "shared"],
-  "exclude": ["node_modules", "**/dist"]
+  }
 }

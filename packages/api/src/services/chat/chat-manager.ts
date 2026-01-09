@@ -93,7 +93,7 @@ export class ChatManager {
       // Check if message is a search query
       const isSearchQuery = await this.isSearchQuery(userMessage);
 
-      let searchResults = null;
+      let searchResults: any = undefined;
       let responseContent = '';
 
       if (isSearchQuery) {

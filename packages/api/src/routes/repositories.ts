@@ -3,7 +3,7 @@ import { getRepositoryManager } from '../services/storage/repositories.js';
 import { VSCodeIntegration } from '../utils/vscode.js';
 import { ApiResponse, Repository } from '@codescan/shared';
 
-const router = Router();
+const router: Router = Router();
 const repoManager = getRepositoryManager();
 
 /**

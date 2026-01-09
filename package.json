@@ -6,10 +6,11 @@
   "type": "module",
   "scripts": {
     "dev": "turbo run dev --no-cache",
-    "build": "turbo run build",
+    "build": "pnpm --filter @codescan/shared build && pnpm --filter @codescan/api build && pnpm --filter @codescan/cli build",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"packages/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "server": "cp packages/api/src/services/storage/schema.sql packages/api/dist/services/storage/schema.sql 2>/dev/null; cd packages/api && npm start",
     "api": "pnpm --filter @codescan/api dev",
     "cli": "pnpm --filter @codescan/cli dev",
     "web": "pnpm --filter @codescan/web dev",

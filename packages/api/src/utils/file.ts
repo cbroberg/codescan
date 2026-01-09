@@ -5,8 +5,11 @@ import { resolve } from 'path';
  * Expand ~ to home directory
  */
 export function expandUser(path: string): string {
-  if (path.startsWith('~')) {
-    return resolve(homedir(), path.slice(1));
+  if (path.startsWith('~/')) {
+    return resolve(homedir(), path.slice(2));
+  }
+  if (path === '~') {
+    return homedir();
   }
   return path;
 }

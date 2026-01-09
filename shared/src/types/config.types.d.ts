@@ -65,12 +65,12 @@ export declare const AIConfigSchema: z.ZodObject<{
     temperature: z.ZodNumber;
     batchSize: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    model: "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" | "claude-opus-4-20250514";
+    model: "claude-3-haiku-20240307" | "claude-3-5-sonnet-20241022" | "claude-opus-4-20250514";
     maxTokens: number;
     temperature: number;
     batchSize: number;
 }, {
-    model: "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" | "claude-opus-4-20250514";
+    model: "claude-3-haiku-20240307" | "claude-3-5-sonnet-20241022" | "claude-opus-4-20250514";
     maxTokens: number;
     temperature: number;
     batchSize: number;
@@ -168,12 +168,12 @@ export declare const AppConfigSchema: z.ZodObject<{
         temperature: z.ZodNumber;
         batchSize: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        model: "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" | "claude-opus-4-20250514";
+        model: "claude-3-haiku-20240307" | "claude-3-5-sonnet-20241022" | "claude-opus-4-20250514";
         maxTokens: number;
         temperature: number;
         batchSize: number;
     }, {
-        model: "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" | "claude-opus-4-20250514";
+        model: "claude-3-haiku-20240307" | "claude-3-5-sonnet-20241022" | "claude-opus-4-20250514";
         maxTokens: number;
         temperature: number;
         batchSize: number;
@@ -208,12 +208,6 @@ export declare const AppConfigSchema: z.ZodObject<{
         logLevel: "debug" | "info" | "warn" | "error";
     }>;
 }, "strip", z.ZodTypeAny, {
-    search: {
-        maxResults: number;
-        contextLines: number;
-        minRelevanceScore: number;
-        groupByRepo: boolean;
-    };
     searchPaths: {
         path: string;
         name?: string | undefined;
@@ -229,8 +223,14 @@ export declare const AppConfigSchema: z.ZodObject<{
         respectGitignore: boolean;
         maxFileSize: number;
     };
+    search: {
+        maxResults: number;
+        contextLines: number;
+        minRelevanceScore: number;
+        groupByRepo: boolean;
+    };
     ai: {
-        model: "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" | "claude-opus-4-20250514";
+        model: "claude-3-haiku-20240307" | "claude-3-5-sonnet-20241022" | "claude-opus-4-20250514";
         maxTokens: number;
         temperature: number;
         batchSize: number;
@@ -247,12 +247,6 @@ export declare const AppConfigSchema: z.ZodObject<{
         logLevel: "debug" | "info" | "warn" | "error";
     };
 }, {
-    search: {
-        maxResults: number;
-        contextLines: number;
-        minRelevanceScore: number;
-        groupByRepo: boolean;
-    };
     searchPaths: {
         path: string;
         name?: string | undefined;
@@ -268,8 +262,14 @@ export declare const AppConfigSchema: z.ZodObject<{
         respectGitignore: boolean;
         maxFileSize: number;
     };
+    search: {
+        maxResults: number;
+        contextLines: number;
+        minRelevanceScore: number;
+        groupByRepo: boolean;
+    };
     ai: {
-        model: "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" | "claude-opus-4-20250514";
+        model: "claude-3-haiku-20240307" | "claude-3-5-sonnet-20241022" | "claude-opus-4-20250514";
         maxTokens: number;
         temperature: number;
         batchSize: number;

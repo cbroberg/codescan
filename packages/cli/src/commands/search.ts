@@ -31,9 +31,9 @@ export const searchCommand = new Command()
       const searchOptions = {
         maxResults: parseInt(options.max),
         filters: {
-          technologies: options.tech ? options.tech.split(',').map((t) => t.trim()) : undefined,
-          repositories: options.repo ? options.repo.split(',').map((r) => r.trim()) : undefined,
-          languages: options.lang ? options.lang.split(',').map((l) => l.trim()) : undefined,
+          technologies: options.tech ? options.tech.split(',').map((t: string) => t.trim()) : undefined,
+          repositories: options.repo ? options.repo.split(',').map((r: string) => r.trim()) : undefined,
+          languages: options.lang ? options.lang.split(',').map((l: string) => l.trim()) : undefined,
         },
       };
 

@@ -4,7 +4,7 @@ import { getRepositoryManager } from '../services/storage/repositories.js';
 import { getLogger } from '../utils/logger.js';
 import { ApiResponse, IndexingStatus } from '@codescan/shared';
 
-const router = Router();
+const router: Router = Router();
 const logger = getLogger();
 const indexManager = new IndexManager();
 const repoManager = getRepositoryManager();

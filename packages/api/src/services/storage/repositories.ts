@@ -107,7 +107,7 @@ export class RepositoryManager {
         // Delete cascades to files, chunks, technologies
         const stmt = db.prepare('DELETE FROM repositories WHERE id = ?');
         stmt.run(id);
-      })();
+      });
 
       return true;
     } catch (error) {

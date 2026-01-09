@@ -37,7 +37,7 @@ export const chatCommand = new Command()
             message: 'You',
             prefix: '→',
           },
-        ]);
+        ] as any);
 
         const message = answer.message.trim();
 

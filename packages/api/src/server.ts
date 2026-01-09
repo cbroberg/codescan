@@ -108,8 +108,11 @@ async function startServer(): Promise<void> {
 }
 
 // Start if run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  startServer();
+if (import.meta.url.endsWith(process.argv[1])) {
+  startServer().catch((err) => {
+    logger.error('Failed to start server', err);
+    process.exit(1);
+  });
 }
 
 export { app, dbManager };

@@ -3,7 +3,7 @@ import { SearchEngine } from '../services/search/search-engine.js';
 import { getLogger } from '../utils/logger.js';
 import { ApiResponse, SearchRequest, SearchResult } from '@codescan/shared';
 
-const router = Router();
+const router: Router = Router();
 const logger = getLogger();
 const searchEngine = new SearchEngine();
 

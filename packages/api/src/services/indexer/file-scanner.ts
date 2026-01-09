@@ -246,7 +246,6 @@ export class FileScanner {
       '.c': 'c',
       '.h': 'c',
       '.hpp': 'cpp',
-      '.java': 'java',
       '.kt': 'kotlin',
       '.swift': 'swift',
       '.m': 'objc',

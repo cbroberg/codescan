@@ -1,14 +1,16 @@
-import Database from 'better-sqlite3';
-import { readFileSync } from 'fs';
+import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { mkdir } from 'fs/promises';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class DatabaseManager {
-  private db: Database.Database | null = null;
+  private db: SqlJsDatabase | null = null;
   private dbPath: string;
+  private SQL: any = null;
 
   constructor(dbPath: string) {
     this.dbPath = dbPath;
@@ -19,25 +21,45 @@ export class DatabaseManager {
    */
   public async initialize(): Promise<void> {
     try {
-      this.db = new Database(this.dbPath);
+      // Initialize sql.js
+      this.SQL = await initSqlJs();
 
-      // Enable WAL mode for better concurrency
-      this.db.pragma('journal_mode = WAL');
+      // Ensure directory exists
+      const dir = dirname(this.dbPath);
+      if (!existsSync(dir)) {
+        await mkdir(dir, { recursive: true });
+      }
 
-      // Performance optimizations
-      this.db.pragma('synchronous = NORMAL');
-      this.db.pragma('cache_size = -64000'); // 64MB cache
+      // Load or create database
+      if (existsSync(this.dbPath)) {
+        const buffer = readFileSync(this.dbPath);
+        this.db = new this.SQL.Database(buffer);
+        console.log(`✓ Database loaded from ${this.dbPath}`);
+      } else {
+        this.db = new this.SQL.Database();
+        console.log(`✓ New database created`);
+      }
 
       // Load and execute schema
       const schemaPath = resolve(__dirname, 'schema.sql');
       const schema = readFileSync(schemaPath, 'utf-8');
 
       // Split and execute statements
-      const statements = schema.split(';').filter((stmt) => stmt.trim());
+      const statements = schema
+        .split(';')
+        .filter((stmt) => stmt.trim());
       for (const stmt of statements) {
-        this.db.exec(stmt);
+        if (stmt.trim()) {
+          try {
+            this.db!.run(stmt);
+          } catch (e) {
+            // Schema might already exist, ignore errors
+          }
+        }
       }
 
+      // Save to disk
+      this.save();
       console.log(`✓ Database initialized at ${this.dbPath}`);
     } catch (error) {
       console.error('Failed to initialize database:', error);
@@ -48,21 +70,65 @@ export class DatabaseManager {
   /**
    * Get database instance
    */
-  public getDatabase(): Database.Database {
-    if (!this.db) {
-      throw new Error('Database not initialized. Call initialize() first.');
-    }
+  public getDatabase(): SqlJsDatabase | null {
     return this.db;
   }
 
   /**
    * Execute a prepared statement
    */
-  public prepare<T = void>(sql: string): Database.Statement<T> {
+  public prepare(sql: string): any {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
-    return this.db.prepare(sql);
+
+    // Return a simple statement wrapper
+    return {
+      run: (...params: any[]) => {
+        try {
+          this.db!.run(sql, params);
+          this.save();
+          return { changes: 1 };
+        } catch (error) {
+          throw error;
+        }
+      },
+      get: (...params: any[]) => {
+        try {
+          const results = this.db!.exec(sql, params);
+          if (results.length === 0 || results[0].values.length === 0) {
+            return undefined;
+          }
+          const columns = results[0].columns;
+          const row = results[0].values[0];
+          const obj: any = {};
+          columns.forEach((col: string, idx: number) => {
+            obj[col] = row[idx];
+          });
+          return obj;
+        } catch (error) {
+          throw error;
+        }
+      },
+      all: (...params: any[]) => {
+        try {
+          const results = this.db!.exec(sql, params);
+          if (results.length === 0) {
+            return [];
+          }
+          const columns = results[0].columns;
+          return results[0].values.map((row: any) => {
+            const obj: any = {};
+            columns.forEach((col: string, idx: number) => {
+              obj[col] = row[idx];
+            });
+            return obj;
+          });
+        } catch (error) {
+          throw error;
+        }
+      },
+    };
   }
 
   /**
@@ -72,18 +138,28 @@ export class DatabaseManager {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
-    this.db.exec(sql);
+    this.db.run(sql);
+    this.save();
   }
 
   /**
-   * Start a transaction
+   * Execute a transaction
    */
   public transaction<T>(fn: () => T): T {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
-    const transaction = this.db.transaction(fn);
-    return transaction();
+
+    try {
+      this.db.run('BEGIN TRANSACTION');
+      const result = fn();
+      this.db.run('COMMIT');
+      this.save();
+      return result;
+    } catch (error) {
+      this.db.run('ROLLBACK');
+      throw error;
+    }
   }
 
   /**
@@ -91,6 +167,7 @@ export class DatabaseManager {
    */
   public close(): void {
     if (this.db) {
+      this.save();
       this.db.close();
       this.db = null;
       console.log('Database connection closed');
@@ -98,60 +175,65 @@ export class DatabaseManager {
   }
 
   /**
+   * Save database to disk
+   */
+  private save(): void {
+    if (!this.db) return;
+    try {
+      const data = this.db.export();
+      const buffer = Buffer.from(data);
+      writeFileSync(this.dbPath, buffer);
+    } catch (error) {
+      console.error('Failed to save database:', error);
+    }
+  }
+
+  /**
    * Get database statistics
    */
   public getStats(): {
-    pageCount: number;
-    pageSize: number;
-    sizeBytes: number;
+    repositories: number;
+    files: number;
+    chunks: number;
+    size: number;
   } {
-    if (!this.db) {
-      throw new Error('Database not initialized');
+    try {
+      const repStmt = this.prepare(
+        'SELECT COUNT(*) as count FROM repositories'
+      );
+      const fileStmt = this.prepare('SELECT COUNT(*) as count FROM files');
+      const chunkStmt = this.prepare('SELECT COUNT(*) as count FROM chunks');
+
+      const repositories = (repStmt.get() as any)?.count || 0;
+      const files = (fileStmt.get() as any)?.count || 0;
+      const chunks = (chunkStmt.get() as any)?.count || 0;
+
+      const fileSize = existsSync(this.dbPath)
+        ? readFileSync(this.dbPath).length
+        : 0;
+
+      return {
+        repositories,
+        files,
+        chunks,
+        size: fileSize,
+      };
+    } catch (error) {
+      return { repositories: 0, files: 0, chunks: 0, size: 0 };
     }
-
-    const pageCount = this.db.prepare('PRAGMA page_count;').get() as { page_count: number };
-    const pageSize = this.db.prepare('PRAGMA page_size;').get() as { page_size: number };
-
-    return {
-      pageCount: pageCount.page_count,
-      pageSize: pageSize.page_size,
-      sizeBytes: pageCount.page_count * pageSize.page_size,
-    };
-  }
-
-  /**
-   * Vacuum database
-   */
-  public vacuum(): void {
-    if (!this.db) {
-      throw new Error('Database not initialized');
-    }
-    this.db.exec('VACUUM;');
-    console.log('✓ Database vacuumed');
-  }
-
-  /**
-   * Run migrations (placeholder for future)
-   */
-  public async runMigrations(): Promise<void> {
-    // TODO: Implement migration system
-    console.log('✓ Migrations completed');
   }
 }
 
-// Singleton instance
-let dbManager: DatabaseManager | null = null;
+let databaseManager: DatabaseManager | null = null;
 
 export function initializeDatabase(dbPath: string): DatabaseManager {
-  if (!dbManager) {
-    dbManager = new DatabaseManager(dbPath);
-  }
-  return dbManager;
+  databaseManager = new DatabaseManager(dbPath);
+  return databaseManager;
 }
 
 export function getDatabaseManager(): DatabaseManager {
-  if (!dbManager) {
-    throw new Error('Database manager not initialized');
+  if (!databaseManager) {
+    throw new Error('Database not initialized');
   }
-  return dbManager;
+  return databaseManager;
 }
