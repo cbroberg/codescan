@@ -110,7 +110,12 @@ export class IndexManager {
             this.logger.info(`✓ Indexed ${i + 1}/${totalFiles} files`);
           }
         } catch (error) {
-          this.logger.warn(`Failed to index file ${scannedFile.path}`, error);
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          const errorStack = error instanceof Error ? error.stack : '';
+          this.logger.warn(`Failed to index file ${scannedFile.path}: ${errorMsg}`);
+          if (errorStack) {
+            this.logger.debug(`Stack trace: ${errorStack}`);
+          }
         }
       }
 
