@@ -2,6 +2,7 @@ import { Parser } from './base-parser.js';
 import { TypeScriptParser } from './typescript-parser.js';
 import { JavaScriptParser } from './javascript-parser.js';
 import { PythonParser, JsonParser, GenericParser } from './generic-parser.js';
+import { PhpParser } from './php-parser.js';
 import { extname, basename } from 'path';
 import { getLogger } from '../../../utils/logger.js';
 
@@ -26,6 +27,7 @@ export class ParserRegistry {
     const javaScriptParser = new JavaScriptParser();
     const pythonParser = new PythonParser();
     const jsonParser = new JsonParser();
+    const phpParser = new PhpParser();
     const genericParser = new GenericParser();
 
     // Register parsers
@@ -33,6 +35,7 @@ export class ParserRegistry {
     this.register('javascript', javaScriptParser);
     this.register('python', pythonParser);
     this.register('json', jsonParser);
+    this.register('php', phpParser);
     this.register('generic', genericParser);
 
     // Map extensions to parsers
@@ -50,6 +53,10 @@ export class ParserRegistry {
 
     jsonParser.getSupportedExtensions().forEach((ext) => {
       this.extensionMap.set(ext, 'json');
+    });
+
+    phpParser.getSupportedExtensions().forEach((ext) => {
+      this.extensionMap.set(ext, 'php');
     });
 
     genericParser.getSupportedExtensions().forEach((ext) => {
