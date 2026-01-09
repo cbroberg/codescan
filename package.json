@@ -1,0 +1,28 @@
+{
+  "name": "codescan",
+  "version": "0.1.0",
+  "description": "AI-powered semantic code search tool",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev --no-cache",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "api": "pnpm --filter @codescan/api dev",
+    "cli": "pnpm --filter @codescan/cli dev",
+    "web": "pnpm --filter @codescan/web dev",
+    "clean": "turbo run clean && rm -rf node_modules pnpm-lock.yaml"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prettier": "^3.3.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
