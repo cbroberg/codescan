@@ -12,7 +12,7 @@
     "format": "prettier --write \"packages/**/*.{ts,tsx,js,jsx,json,css}\"",
     "server": "cp packages/api/src/services/storage/schema.sql packages/api/dist/services/storage/schema.sql 2>/dev/null; cd packages/api && npm start",
     "api": "pnpm --filter @codescan/api dev",
-    "cli": "pnpm --filter @codescan/cli dev",
+    "cli": "pnpm --filter @codescan/cli start",
     "web": "pnpm --filter @codescan/web dev",
     "clean": "turbo run clean && rm -rf node_modules pnpm-lock.yaml"
   },

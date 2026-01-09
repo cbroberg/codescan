@@ -12,7 +12,7 @@ export class ApiClient {
     this.baseUrl = baseUrl;
     this.client = axios.create({
       baseURL: `${baseUrl}/api`,
-      timeout: 60000,
+      timeout: 600000, // 10 minutes for long-running indexing operations
     });
   }
 

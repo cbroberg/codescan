@@ -26,17 +26,13 @@ router.post('/build', async (req: Request, res: Response) => {
       return res.status(400).json(response);
     }
 
-    // Start indexing asynchronously
-    indexManager
-      .indexRepository(path, name)
-      .catch((error) => {
-        logger.error('Background indexing failed', error);
-      });
+    // Perform indexing synchronously and wait for completion
+    await indexManager.indexRepository(path, name);
 
     const response: ApiResponse<{ message: string; repositoryPath: string }> = {
       success: true,
       data: {
-        message: 'Indexing started',
+        message: 'Indexing completed',
         repositoryPath: path,
       },
       timestamp: new Date().toISOString(),
@@ -46,7 +42,7 @@ router.post('/build', async (req: Request, res: Response) => {
   } catch (error) {
     const response: ApiResponse<null> = {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to start indexing',
+      error: error instanceof Error ? error.message : 'Failed to index repository',
       timestamp: new Date().toISOString(),
     };
     res.status(500).json(response);

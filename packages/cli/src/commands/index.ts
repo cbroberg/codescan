@@ -2,9 +2,20 @@ import { Command } from 'commander';
 import { ApiClient } from '../client/api-client.js';
 import { Formatters } from '../ui/formatters.js';
 import ora from 'ora';
-import Conf from 'conf';
+import { readFileSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
 
-const config = new Conf({ projectName: 'codescan' });
+function loadConfig(): any {
+  const configPath = join(homedir(), '.config', 'codescan', 'config.json');
+  try {
+    const content = readFileSync(configPath, 'utf-8');
+    return JSON.parse(content || '{}');
+  } catch {
+    return { searchPaths: [] };
+  }
+}
+
 const apiClient = new ApiClient();
 
 export const indexCommand = new Command()
@@ -25,7 +36,8 @@ export const indexCommand = new Command()
         process.exit(1);
       }
 
-      const searchPaths = config.get('searchPaths', []) as any[];
+      const config = loadConfig();
+      const searchPaths = config.searchPaths || [];
 
       if (searchPaths.length === 0) {
         console.log(

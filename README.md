@@ -42,11 +42,33 @@ AI-powered semantic code search tool for your local repositories. Find code by d
    pnpm build
    ```
 
-4. **Make CLI executable** (optional):
-   ```bash
-   chmod +x packages/cli/bin/codescan.js
-   # Or use: pnpm cli <command>
-   ```
+### Global CLI Installation (Optional)
+
+To use `codescan` command directly instead of `pnpm cli`, link the CLI globally:
+
+```bash
+# Link CLI to system PATH
+cd packages/cli
+pnpm link --global
+
+# Now you can use codescan from anywhere:
+codescan init
+codescan index
+codescan search "your query"
+codescan server start
+```
+
+If using npm instead of pnpm:
+```bash
+cd packages/cli
+npm link
+```
+
+To unlink later:
+```bash
+pnpm unlink --global
+# or: npm unlink -g codescan
+```
 
 ## Usage
 
@@ -54,10 +76,15 @@ AI-powered semantic code search tool for your local repositories. Find code by d
 
 The CLI commands need the backend API server running. Start it in one terminal:
 
+**If using global CLI (recommended):**
+```bash
+codescan server start
+```
+
+**Or if using pnpm directly:**
 ```bash
 pnpm server
-# Or directly:
-pnpm cli server start
+# Or: pnpm cli server start
 ```
 
 Server runs on `http://localhost:3000`
@@ -66,8 +93,14 @@ Server runs on `http://localhost:3000`
 
 Configure which directories to search:
 
+**With global CLI:**
 ```bash
-pnpm cli init
+codescan init /path/to/your/code "My Code"
+```
+
+**Or with pnpm:**
+```bash
+pnpm cli init /path/to/your/code "My Code"
 ```
 
 You'll be prompted to add directories. Example:
@@ -81,6 +114,12 @@ You'll be prompted to add directories. Example:
 
 Index your repositories (one-time or periodic):
 
+**With global CLI:**
+```bash
+codescan index
+```
+
+**Or with pnpm:**
 ```bash
 pnpm cli index
 ```
@@ -92,6 +131,14 @@ This scans files, extracts functions/classes, and builds the semantic search ind
 #### Quick Search
 Search from command line:
 
+**With global CLI:**
+```bash
+codescan search "Microsoft Teams notifications"
+codescan search "authentication logic" --tech teams-sdk
+codescan search "React hooks" --repo my-web-app --max 10
+```
+
+**Or with pnpm:**
 ```bash
 pnpm cli search "Microsoft Teams notifications"
 pnpm cli search "authentication logic" --tech teams-sdk
@@ -107,6 +154,12 @@ Options:
 #### Interactive Chat
 For exploratory searching with follow-ups:
 
+**With global CLI:**
+```bash
+codescan chat
+```
+
+**Or with pnpm:**
 ```bash
 pnpm cli chat
 ```
@@ -133,6 +186,12 @@ Found 5 matches:
 
 View indexing progress and statistics:
 
+**With global CLI:**
+```bash
+codescan status
+```
+
+**Or with pnpm:**
 ```bash
 pnpm cli status
 ```
@@ -147,6 +206,12 @@ Shows:
 
 See all indexed repositories:
 
+**With global CLI:**
+```bash
+codescan repos
+```
+
+**Or with pnpm:**
 ```bash
 pnpm cli repos
 ```
@@ -268,9 +333,11 @@ LOG_LEVEL=info
 
 ## Tips
 
+- **CLI commands too long?** Use global CLI installation (see above) to use `codescan` command directly
 - **First indexing slow?** That's normal. Depends on your code volume. 1000 files ≈ 30 seconds.
-- **API key cost?** Semantic search uses Claude Haiku (cheapest). ~$0.01 per search.
-- **Want to re-index?** Just run `pnpm cli index` again. It detects changes.
+- **API key cost?** Semantic search uses Claude API. Cost depends on query complexity (~$0.01-$0.10 per search).
+- **Want to re-index?** Just run `codescan index` or `pnpm cli index` again. It detects changes.
+- **API not running?** Start it in another terminal with `codescan server start` or `pnpm server`
 - **Something not working?** Check logs with `LOG_LEVEL=debug pnpm api` for detailed output.
 
 ## Next Steps

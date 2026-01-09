@@ -58,8 +58,17 @@ export function shouldIndex(filePath: string, extensions: string[]): boolean {
  */
 export function matchesExcludePattern(path: string, patterns: string[]): boolean {
   return patterns.some((pattern) => {
-    // Simple glob-like matching
-    const regex = new RegExp(pattern.replace('*', '.*').replace('?', '.'));
+    // Convert glob pattern to regex
+    // ** = any number of directories
+    // * = any characters except /
+    // ? = single character except /
+    let regexStr = pattern
+      .replace(/\*\*/g, '###GLOBSTAR###') // Replace ** temporarily
+      .replace(/\*/g, '[^/]*')             // * matches anything except /
+      .replace(/###GLOBSTAR###/g, '.*')    // ** matches anything including /
+      .replace(/\?/g, '[^/]');             // ? matches single char except /
+
+    const regex = new RegExp(`^${regexStr}$`);
     return regex.test(path);
   });
 }

@@ -14,7 +14,7 @@ export class ClaudeClient {
 
   constructor(
     apiKey: string = process.env.ANTHROPIC_API_KEY || '',
-    model: string = process.env.AI_MODEL || 'claude-3-5-sonnet-20241022',
+    model: string = process.env.AI_MODEL || 'claude-opus-4-5-20251101',
     maxTokens: number = parseInt(process.env.AI_MAX_TOKENS || '4096'),
     temperature: number = parseFloat(process.env.AI_TEMPERATURE || '0.3'),
   ) {

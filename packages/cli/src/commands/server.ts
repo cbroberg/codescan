@@ -19,7 +19,8 @@ export const serverCommand = new Command()
     const apiRoot = path.resolve(__dirname, '../../..', 'packages/api');
 
     // Start the server using node dist/server.js
-    const serverProcess = spawn('node', ['dist/server.js'], {
+    // Use shell to ensure nvm/node environment is properly inherited
+    const serverProcess = spawn('/bin/bash', ['-c', 'node dist/server.js'], {
       cwd: apiRoot,
       stdio: 'inherit',
       env: {
