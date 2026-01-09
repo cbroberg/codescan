@@ -169,31 +169,29 @@ export class IndexManager {
     // Chunk file
     const chunks = this.chunker.chunk(parsedFile, repositoryId, fileId);
 
-    // Insert chunks with transaction
+    // Insert chunks
     const insertChunkStmt = db.prepare(
       `INSERT INTO chunks (id, file_id, repo_id, chunk_type, name, start_line, end_line, content, context, search_text, metadata)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
 
-    db.transaction(() => {
-      for (const chunk of chunks) {
-        const searchText = this.chunker.createSearchText(chunk);
+    for (const chunk of chunks) {
+      const searchText = this.chunker.createSearchText(chunk);
 
-        insertChunkStmt.run(
-          chunk.id,
-          chunk.fileId,
-          chunk.repositoryId,
-          chunk.type,
-          chunk.name || null,
-          chunk.startLine,
-          chunk.endLine,
-          chunk.content,
-          chunk.context,
-          searchText,
-          JSON.stringify(chunk.metadata || {}),
-        );
-      }
-    })();
+      insertChunkStmt.run(
+        chunk.id,
+        chunk.fileId,
+        chunk.repositoryId,
+        chunk.type,
+        chunk.name || null,
+        chunk.startLine,
+        chunk.endLine,
+        chunk.content,
+        chunk.context,
+        searchText,
+        JSON.stringify(chunk.metadata || {}),
+      );
+    }
 
     // Index technologies
     if (parsedFile.dependencies && parsedFile.dependencies.length > 0) {
