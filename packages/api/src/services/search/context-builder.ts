@@ -52,7 +52,7 @@ export class ContextBuilder {
       SELECT
         c.id,
         c.name,
-        c.type,
+        c.chunk_type,
         c.start_line,
         c.end_line,
         c.content,
@@ -99,7 +99,7 @@ export class ContextBuilder {
         chunk: {
           id: row.id,
           name: row.name,
-          type: row.type,
+          type: row.chunk_type,
           startLine: row.start_line,
           endLine: row.end_line,
           content: row.content,
@@ -136,19 +136,22 @@ export class ContextBuilder {
   ): { before: string; after: string } {
     const db = getDatabaseManager();
 
-    const sql = `
-      SELECT content FROM files WHERE id = ?
+    // Get all chunks from this file to reconstruct the full content
+    const chunksql = `
+      SELECT content FROM chunks WHERE file_id = ? ORDER BY start_line
     `;
 
     try {
-      const stmt = db.prepare(sql);
-      const row = stmt.get(fileId) as any;
+      const stmt = db.prepare(chunksql);
+      const chunks = stmt.all(fileId) as any[];
 
-      if (!row) {
+      if (chunks.length === 0) {
         return { before: '', after: '' };
       }
 
-      const lines = row.content.split('\n');
+      // Reconstruct file content from chunks
+      const fullContent = chunks.map((c) => c.content).join('\n');
+      const lines = fullContent.split('\n');
 
       // Get lines before
       const beforeStart = Math.max(0, startLine - this.contextLines - 1);
