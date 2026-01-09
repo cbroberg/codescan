@@ -21,7 +21,10 @@
     "clean": "rm -rf dist",
     "dev": "tsc --watch"
   },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
   "devDependencies": {
-    "typescript": "workspace:*"
+    "typescript": "^5.6.0"
   }
 }

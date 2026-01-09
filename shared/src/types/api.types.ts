@@ -157,59 +157,16 @@ export interface ChatResponse {
 }
 
 // ====== Configuration Types ======
-
-export interface ConfigSearchPath {
-  path: string;
-  name?: string;
-  exclude?: string[];
-  maxDepth?: number;
-}
-
-export interface IndexingConfig {
-  fileExtensions: string[];
-  excludePatterns: string[];
-  chunkSize: number;
-  chunkOverlap: number;
-  followSymlinks: boolean;
-  respectGitignore: boolean;
-  maxFileSize: number; // bytes
-}
-
-export interface SearchConfig {
-  maxResults: number;
-  contextLines: number;
-  minRelevanceScore: number;
-  groupByRepo: boolean;
-}
-
-export interface AIConfig {
-  model: 'claude-3-haiku-20240307' | 'claude-3-5-sonnet-20241022' | 'claude-opus-4-20250514';
-  maxTokens: number;
-  temperature: number;
-  batchSize: number;
-}
-
-export interface StorageConfig {
-  dbPath: string;
-  enableWatcher: boolean;
-  watchDebounce: number; // ms
-}
-
-export interface ServerConfig {
-  apiPort: number;
-  webPort: number;
-  nodeEnv: 'development' | 'production' | 'test';
-  logLevel: 'debug' | 'info' | 'warn' | 'error';
-}
-
-export interface AppConfig {
-  searchPaths: ConfigSearchPath[];
-  indexing: IndexingConfig;
-  search: SearchConfig;
-  ai: AIConfig;
-  storage: StorageConfig;
-  server: ServerConfig;
-}
+// (Re-exported from config.types.ts which has Zod validation)
+export type {
+  ConfigSearchPath,
+  IndexingConfig,
+  SearchConfig,
+  AIConfig,
+  StorageConfig,
+  ServerConfig,
+  AppConfig,
+} from './config.types.js';
 
 // ====== Error Types ======
 
