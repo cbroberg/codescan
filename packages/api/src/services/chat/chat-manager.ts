@@ -100,9 +100,52 @@ export class ChatManager {
         // Perform semantic search
         try {
           // Extract meaningful keywords from the message
-          const searchQuery = this.extractSearchQuery(userMessage);
+          const keywords = this.extractSearchQuery(userMessage).split(' ').filter(Boolean);
 
-          const results = await this.searchEngine.search(searchQuery, { maxResults: 5 });
+          // Search for each keyword and combine results (OR logic)
+          let results: any = null;
+
+          if (keywords.length > 0) {
+            // Search for the first keyword
+            results = await this.searchEngine.search(keywords[0], { maxResults: 10 });
+
+            // If we have multiple keywords, also search for each individually and merge
+            if (keywords.length > 1) {
+              const allResults = results;
+
+              for (let i = 1; i < keywords.length; i++) {
+                const keywordResults = await this.searchEngine.search(keywords[i], { maxResults: 10 });
+
+                // Merge results (avoiding duplicates)
+                const existingIds = new Set(
+                  allResults.results.flatMap((r: any) => r.matches.map((m: any) => m.id)),
+                );
+
+                keywordResults.results.forEach((group: any) => {
+                  const newMatches = group.matches.filter((m: any) => !existingIds.has(m.id));
+                  if (newMatches.length > 0) {
+                    const existingGroup = allResults.results.find((r: any) => r.repository.id === group.repository.id);
+                    if (existingGroup) {
+                      existingGroup.matches.push(...newMatches);
+                    } else {
+                      allResults.results.push({ ...group, matches: newMatches });
+                    }
+                  }
+                });
+              }
+
+              // Limit total results
+              allResults.results = allResults.results.map((r: any) => ({
+                ...r,
+                matches: r.matches.slice(0, 5),
+              }));
+
+              results = allResults;
+            }
+          } else {
+            throw new Error('No keywords extracted from search query');
+          }
+
           searchResults = results;
 
           // Format search results for display
