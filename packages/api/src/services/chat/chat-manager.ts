@@ -99,7 +99,10 @@ export class ChatManager {
       if (isSearchQuery) {
         // Perform semantic search
         try {
-          const results = await this.searchEngine.search(userMessage, { maxResults: 5 });
+          // Extract meaningful keywords from the message
+          const searchQuery = this.extractSearchQuery(userMessage);
+
+          const results = await this.searchEngine.search(searchQuery, { maxResults: 5 });
           searchResults = results;
 
           // Format search results for display
@@ -178,6 +181,29 @@ User: ${userMessage}`,
       session.messages.push(errorMsg);
       throw error;
     }
+  }
+
+  /**
+   * Extract meaningful keywords from a natural language search query
+   */
+  private extractSearchQuery(message: string): string {
+    // Common stop words to remove
+    const stopWords = new Set([
+      'find', 'search', 'where', 'code', 'file', 'where', 'a', 'the', 'do', 'did',
+      'show', 'me', 'i', 'can', 'could', 'would', 'should', 'please', 'how', 'what',
+      'is', 'are', 'am', 'be', 'been', 'to', 'in', 'on', 'at', 'of', 'for', 'and',
+      'or', 'not', 'but', 'if', 'an', 'by', 'as', 'with', 'from', 'up', 'about'
+    ]);
+
+    // Split and filter
+    const keywords = message
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(word => word.length > 2 && !stopWords.has(word))
+      .slice(0, 5) // Limit to first 5 meaningful keywords
+      .join(' ');
+
+    return keywords || message; // Fallback to original if no keywords extracted
   }
 
   /**
